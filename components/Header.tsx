@@ -1,116 +1,75 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import clsx from 'clsx';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard,
   AppWindow,
   BarChart3,
   Activity,
-  User,
+  Layers,
   Menu,
   X,
-  Layers,
   Target,
-  ShieldAlert,
-  Sun,
-  Moon
+  ChevronDown,
+  PieChart,
+  Network,
+  Briefcase,
+  Ticket
 } from 'lucide-react';
 
-// ── Types ──────────────────────────────────────────────────────────────────────
-
-interface NavItem {
-  label: string;
-  href: string;
-  icon: React.ComponentType<React.SVGProps<SVGSVGElement> & { size?: number | string }>;
-}
-
-// ── Data ───────────────────────────────────────────────────────────────────────
-
-const NAV_ITEMS: NavItem[] = [
-  { label: 'Overview', href: '/dashboard', icon: LayoutDashboard },
-  { label: 'Applications', href: '/dashboard/applications', icon: AppWindow },
-  { label: 'Analytics', href: '/dashboard/analytics', icon: BarChart3 },
-  { label: 'Maturity', href: '/dashboard/maturity', icon: Activity },
-  { label: 'Architecture', href: '/dashboard/architecture', icon: Layers },
-  { label: 'Data Quality', href: '/dashboard/quality', icon: ShieldAlert },
-  { label: 'ROI & Value', href: '/dashboard/roi', icon: Target },
+const EXEC_NAV_ITEMS = [
+  { label: 'CIO View', href: '/dashboard/cio', icon: Target },
+  { label: 'CFO View', href: '/dashboard/cfo', icon: PieChart },
+  { label: 'CTO View', href: '/dashboard/cto', icon: Network },
+  { label: 'PM View', href: '/dashboard/pm', icon: Briefcase },
 ];
 
-// ── Helpers ────────────────────────────────────────────────────────────────────
+const OPS_NAV_ITEMS = [
+  { label: 'Integration Architecture', href: '/dashboard', icon: LayoutDashboard },
+  { label: 'Application Portfolio', href: '/dashboard/applications', icon: AppWindow },
+  { label: 'Data Quality', href: '/dashboard/quality', icon: Activity },
+  { label: 'Cost Intelligence', href: '/dashboard/roi', icon: BarChart3 },
+  { label: 'Architecture Board', href: '/dashboard/architecture', icon: Layers },
+  { label: 'Remediation Tickets', href: '/dashboard/tickets', icon: Ticket },
+];
 
-/** Check whether `pathname` matches the nav item's route. */
-function isActive(pathname: string, href: string): boolean {
-  if (href === '/dashboard') return pathname === '/dashboard';
+const isActive = (pathname: string, href: string) => {
+  if (href === '/dashboard') {
+    return pathname === href;
+  }
   return pathname.startsWith(href);
-}
-
-// ── Component ──────────────────────────────────────────────────────────────────
+};
 
 export default function Header() {
-  const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [isLight, setIsLight] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const pathname = usePathname();
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Initialize theme state from DOM (set by the script in layout)
-  useEffect(() => {
-    // Check local storage or default to dark
-    const storedTheme = localStorage.getItem('theme');
-    setTimeout(() => {
-      if (storedTheme === 'light') {
-        setIsLight(true);
-        document.documentElement.classList.replace('dark', 'light');
-      } else {
-        document.documentElement.classList.replace('light', 'dark');
-      }
-    }, 0);
-  }, []);
-
-  const toggleMobile = useCallback(() => setMobileOpen((prev) => !prev), []);
+  const toggleMobile = useCallback(() => setMobileOpen((o) => !o), []);
   const closeMobile = useCallback(() => setMobileOpen(false), []);
-  
-  const toggleTheme = useCallback(() => {
-    const nextIsLight = !document.documentElement.classList.contains('light');
-    
-    if (nextIsLight) {
-      document.documentElement.classList.add('light');
-    } else {
-      document.documentElement.classList.remove('light');
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setDropdownOpen(false);
+      }
     }
-    
-    setIsLight(nextIsLight);
-    try {
-      localStorage.setItem('theme', nextIsLight ? 'light' : 'dark');
-    } catch (e) {}
-  }, []);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [dropdownRef]);
 
   return (
     <header
-      className="fixed top-0 left-0 right-0 z-50 h-16"
+      className="fixed top-0 left-0 right-0 z-50 h-16 bg-surface-950/70 backdrop-blur-2xl border-b border-surface-800 shadow-sm"
       role="banner"
     >
-      {/* ── Backdrop ─────────────────────────────────────────────────────── */}
-      <div
-        className="absolute inset-0 bg-surface-950/80 backdrop-blur-xl"
-        aria-hidden="true"
-      />
-
-      {/* ── Bottom border gradient ───────────────────────────────────────── */}
-      <div
-        className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-surface-700/60 to-transparent"
-        aria-hidden="true"
-      />
-
-      {/* ── Animated glow line ───────────────────────────────────────────── */}
-      <div
-        className="glow-line absolute bottom-0 left-0 right-0"
-        aria-hidden="true"
-      />
-
-      {/* ── Content ──────────────────────────────────────────────────────── */}
       <div className="relative mx-auto flex h-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        
         {/* ── Logo ─────────────────────────────────────────────────────── */}
         <Link
           href="/"
@@ -118,114 +77,171 @@ export default function Header() {
           aria-label="EA Intelligence home"
           onClick={closeMobile}
         >
-          {/* Icon mark */}
-          <div className="relative flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-primary-light/20 to-secondary/20 ring-1 ring-primary-light/30 transition-shadow duration-300 group-hover:ring-primary-light/60 group-hover:shadow-[0_0_14px_rgba(59,130,246,0.25)]">
-            <Activity size={18} className="text-primary-light" />
+          <div className="relative flex h-9 w-9 items-center justify-center rounded-lg bg-surface-800 border border-surface-700 text-primary transition-all duration-300 group-hover:bg-surface-700 group-hover:shadow-[0_0_15px_rgba(0,112,243,0.3)]">
+            <Activity size={18} />
           </div>
-
           <div className="flex flex-col leading-none">
-            <span className="gradient-text text-base font-bold tracking-tight">
+            <span className="text-base font-bold tracking-tight text-surface-50">
               EA Intelligence
             </span>
-            <span className="text-[0.625rem] font-medium uppercase tracking-widest text-surface-500">
-              DATA PRODUCT PLATFORM
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-surface-500 mt-1">
+              Data Product Platform
             </span>
           </div>
         </Link>
 
         {/* ── Desktop Navigation ───────────────────────────────────────── */}
-        <nav
-          className="hidden md:flex items-center gap-1"
-          aria-label="Primary navigation"
-        >
-          {NAV_ITEMS.map(({ label, href, icon: Icon }) => {
-            const active = isActive(pathname, href);
-            return (
-              <Link
-                key={href}
-                href={href}
-                className={clsx('nav-link', active && 'active')}
-                aria-current={active ? 'page' : undefined}
-              >
-                <Icon size={16} />
-                {label}
-              </Link>
-            );
-          })}
+        <nav className="hidden lg:flex items-center gap-2" aria-label="Main navigation">
+          
+          {/* Executive Views */}
+          <div className="flex items-center gap-1 bg-surface-900 border border-surface-800 rounded-full p-1 shadow-inner">
+            {EXEC_NAV_ITEMS.map(({ label, href, icon: Icon }) => {
+              const active = isActive(pathname, href);
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  className="relative px-4 py-1.5 rounded-full text-sm font-medium transition-colors"
+                  aria-current={active ? 'page' : undefined}
+                >
+                  {active && (
+                    <motion.div
+                      layoutId="active-nav-pill"
+                      className="absolute inset-0 bg-surface-800 border border-surface-700 rounded-full"
+                      transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                    />
+                  )}
+                  <span className={clsx("relative z-10 flex items-center gap-1.5", active ? "text-primary-light" : "text-surface-400 hover:text-surface-50")}>
+                    <Icon size={14} />
+                    {label.split(' ')[0]}
+                  </span>
+                </Link>
+              );
+            })}
+          </div>
+
+          {/* EA Operations Dropdown */}
+          <div className="relative ml-2" ref={dropdownRef}>
+            <button 
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+              className={clsx(
+                "flex items-center gap-1.5 text-sm font-medium px-4 py-1.5 rounded-full border transition-all",
+                dropdownOpen ? "bg-surface-800 border-surface-700 text-surface-50 shadow-[0_0_15px_rgba(255,255,255,0.05)]" : "bg-transparent border-transparent text-surface-400 hover:bg-surface-900 hover:border-surface-800 hover:text-surface-50"
+              )}
+            >
+              Operations
+              <ChevronDown size={14} className={clsx("transition-transform duration-300", dropdownOpen && "rotate-180")} />
+            </button>
+
+            <AnimatePresence>
+              {dropdownOpen && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                  className="absolute right-0 mt-3 w-64 bg-surface-950/95 backdrop-blur-xl border border-surface-800 rounded-2xl shadow-[0_20px_40px_-10px_rgba(0,0,0,0.5)] py-2 z-50 overflow-hidden"
+                >
+                  <div className="px-4 pb-2 mb-2 border-b border-surface-800/50">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-surface-500">
+                      Engineering & Architecture
+                    </span>
+                  </div>
+                  {OPS_NAV_ITEMS.map(({ label, href, icon: Icon }) => {
+                    const active = isActive(pathname, href);
+                    return (
+                      <Link
+                        key={href}
+                        href={href}
+                        onClick={() => setDropdownOpen(false)}
+                        className={clsx(
+                          'flex items-center gap-3 px-4 py-2.5 text-sm transition-colors',
+                          active ? 'bg-surface-900 text-primary-light font-medium border-l-2 border-primary-light' : 'text-surface-400 hover:bg-surface-800 hover:text-surface-50 border-l-2 border-transparent'
+                        )}
+                      >
+                        <Icon size={16} className={active ? 'text-primary-light' : 'text-surface-500'} />
+                        {label}
+                      </Link>
+                    );
+                  })}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </nav>
 
-        {/* ── Right section ────────────────────────────────────────────── */}
-        <div className="flex items-center gap-4 shrink-0">
-          {/* Live indicator removed */}
-
-          {/* Theme Toggle */}
-          <button
-            onClick={toggleTheme}
-            className="relative flex h-8 w-8 items-center justify-center rounded-full border border-surface-700 bg-surface-800/50 text-surface-400 hover:text-surface-50 hover:bg-surface-700 transition-colors"
-            aria-label="Toggle theme"
-          >
-            {isLight ? <Sun size={14} /> : <Moon size={14} />}
-          </button>
-
-          {/* Avatar removed */}
-
-          {/* ── Mobile hamburger ─────────────────────────────────────── */}
+        {/* ── Mobile hamburger ─────────────────────────────────────── */}
+        <div className="flex lg:hidden items-center gap-4 shrink-0">
           <button
             type="button"
-            className="relative flex md:hidden h-9 w-9 items-center justify-center rounded-lg text-surface-400 transition-colors duration-200 hover:bg-surface-800 hover:text-surface-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-light"
+            className="flex h-10 w-10 items-center justify-center rounded-lg text-surface-400 hover:bg-surface-800 transition-colors border border-surface-800"
             onClick={toggleMobile}
             aria-expanded={mobileOpen}
-            aria-controls="mobile-nav"
-            aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
           >
-            <span className="sr-only">{mobileOpen ? 'Close menu' : 'Open menu'}</span>
-            {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+            {mobileOpen ? <X size={18} /> : <Menu size={18} />}
           </button>
         </div>
       </div>
 
       {/* ── Mobile Navigation Panel ──────────────────────────────────── */}
-      <div
-        id="mobile-nav"
-        className={clsx(
-          'md:hidden absolute left-0 right-0 top-16 overflow-hidden transition-all duration-300 ease-in-out',
-          mobileOpen ? 'max-h-72 opacity-100' : 'max-h-0 opacity-0 pointer-events-none',
+      <AnimatePresence>
+        {mobileOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="lg:hidden absolute left-0 right-0 top-16 overflow-hidden bg-surface-950/95 backdrop-blur-2xl border-b border-surface-800 shadow-2xl"
+          >
+            <nav className="px-4 py-6 space-y-8 max-h-[85vh] overflow-y-auto">
+              <div>
+                <div className="text-[10px] font-bold uppercase tracking-widest text-surface-500 mb-4 px-2">Executive Views</div>
+                <div className="space-y-1">
+                  {EXEC_NAV_ITEMS.map(({ label, href, icon: Icon }) => {
+                    const active = isActive(pathname, href);
+                    return (
+                      <Link
+                        key={href}
+                        href={href}
+                        onClick={closeMobile}
+                        className={clsx(
+                          'flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition-colors',
+                          active ? 'bg-surface-800 text-primary-light font-medium' : 'text-surface-400 hover:bg-surface-800'
+                        )}
+                      >
+                        <Icon size={18} />
+                        {label}
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+              
+              <div>
+                <div className="text-[10px] font-bold uppercase tracking-widest text-surface-500 mb-4 px-2 pt-6 border-t border-surface-800/50">Operations & Engineering</div>
+                <div className="space-y-1">
+                  {OPS_NAV_ITEMS.map(({ label, href, icon: Icon }) => {
+                    const active = isActive(pathname, href);
+                    return (
+                      <Link
+                        key={href}
+                        href={href}
+                        onClick={closeMobile}
+                        className={clsx(
+                          'flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition-colors',
+                          active ? 'bg-surface-800 text-primary-light font-medium' : 'text-surface-400 hover:bg-surface-800'
+                        )}
+                      >
+                        <Icon size={18} />
+                        {label}
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            </nav>
+          </motion.div>
         )}
-      >
-        <nav
-          className="relative border-b border-surface-800/60 bg-surface-950/95 backdrop-blur-xl px-4 py-3 space-y-1"
-          aria-label="Mobile navigation"
-        >
-          {NAV_ITEMS.map(({ label, href, icon: Icon }) => {
-            const active = isActive(pathname, href);
-            return (
-              <Link
-                key={href}
-                href={href}
-                onClick={closeMobile}
-                className={clsx('nav-link w-full', active && 'active')}
-                aria-current={active ? 'page' : undefined}
-              >
-                <Icon size={16} />
-                {label}
-              </Link>
-            );
-          })}
-
-          {/* Live indicator removed */}
-          <div className="flex sm:hidden items-center justify-between gap-2 rounded-lg px-4 py-2">
-            <div className="flex items-center gap-2 text-surface-400">
-            </div>
-            {/* Theme Toggle Mobile */}
-            <button
-              onClick={toggleTheme}
-              className="flex items-center gap-2 text-surface-400 hover:text-surface-50"
-            >
-              {isLight ? <Sun size={18} /> : <Moon size={18} />}
-            </button>
-          </div>
-        </nav>
-      </div>
+      </AnimatePresence>
     </header>
   );
 }

@@ -27,12 +27,40 @@ export default function ROIPage() {
 
       <main className="pt-24 px-4 sm:px-6 lg:px-8 pb-12">
         <div className="mx-auto max-w-7xl">
-          {/* Page Header */}
-          <div className="mb-10">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent mb-2">Business Value & ROI</h1>
-            <p className="mt-2 text-surface-400">
-              Financial performance and strategic impact of the EA Data Product
-            </p>
+          {/* Case Study Header & Narrative */}
+          <div className="mb-10 animate-fade-up">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface-900 border border-surface-800 text-xs font-semibold text-primary mb-4">
+              <Briefcase size={14} /> Case Study
+            </div>
+            <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight gradient-text mb-4">
+              The EA Data Product Transformation
+            </h1>
+            
+            <div className="glass-card p-6 border-primary/20 bg-primary/5 mt-8 mb-4">
+              <h3 className="text-lg font-bold text-surface-50 mb-2">Architecture Vision Statement</h3>
+              <p className="text-surface-300 italic border-l-2 border-primary pl-4 py-1 mb-6">
+                "Accenture's Enterprise Architecture platform will be transformed from a manually maintained documentation repository into a dynamic, trusted intelligence hub - continuously synchronised with authoritative source systems through governed APIs and event-driven integration."
+              </p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <h4 className="text-sm font-bold text-danger mb-2 uppercase tracking-wider flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-danger" /> As-Is Pain
+                  </h4>
+                  <p className="text-sm text-surface-400">
+                    EA data was 4–8 weeks stale with an 18% error rate. EA teams spent 60% of their time manually chasing data via surveys. Portfolio managers made multi-million dollar decisions on data they could not trust.
+                  </p>
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-success mb-2 uppercase tracking-wider flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-success" /> To-Be Benefit
+                  </h4>
+                  <p className="text-sm text-surface-400">
+                    The EA repository is now a governed Data Product with 95% coverage and 4-hour freshness. Data arrives automatically from ServiceNow, SAP, Signavio, and Apptio, driving real-time intelligence engines for the C-Suite.
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
 
           <motion.div
@@ -142,43 +170,51 @@ export default function ROIPage() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.6 }}
-              className="glass-card p-8 bg-gradient-to-b from-surface-800/40 to-blue-900/10"
+              className="glass-card p-8 bg-gradient-to-b from-surface-800/40 to-blue-900/10 flex flex-col justify-between"
             >
-              <h2 className="text-xl font-bold text-surface-100 mb-6">Cumulative Cash Flow</h2>
+              <div>
+                <h2 className="text-xl font-bold text-surface-100 mb-6">Cumulative Cash Flow</h2>
+                
+                <div className="relative pt-6 pb-2">
+                  {/* Y Axis line */}
+                  <div className="absolute left-8 top-0 bottom-0 w-px bg-surface-700"></div>
+                  {/* X Axis line (Zero line) */}
+                  <div className="absolute left-8 right-0 bottom-16 h-px bg-surface-500 border-dashed border-b border-surface-500"></div>
+                  
+                  {/* Year 0 */}
+                  <div className="relative h-12 mb-4 flex items-center group">
+                    <div className="w-8 text-xs text-surface-400 text-right pr-2">Y0</div>
+                    <div className="h-6 bg-red-500/20 border border-red-500/50 rounded-r transition-all group-hover:bg-red-500/30" style={{ width: '60%' }}></div>
+                    <span className="ml-2 text-xs text-red-400 font-mono">-$480K</span>
+                  </div>
+                  
+                  {/* Year 1 */}
+                  <div className="relative h-12 mb-4 flex items-center group">
+                    <div className="w-8 text-xs text-surface-400 text-right pr-2">Y1</div>
+                    <div className="h-6 bg-red-500/20 border border-red-500/50 rounded-r transition-all group-hover:bg-red-500/30" style={{ width: '40%' }}></div>
+                    <span className="ml-2 text-xs text-red-400 font-mono">-$213K</span>
+                  </div>
+                  
+                  {/* Year 2 */}
+                  <div className="relative h-12 mb-4 flex items-center group">
+                    <div className="w-8 text-xs text-surface-400 text-right pr-2">Y2</div>
+                    <div className="h-6 bg-emerald-500/20 border border-emerald-500/50 rounded-r transition-all group-hover:bg-emerald-500/30" style={{ width: '15%' }}></div>
+                    <span className="ml-2 text-xs text-emerald-400 font-mono">+$54K</span>
+                  </div>
+                  
+                  {/* Year 3 */}
+                  <div className="relative h-12 flex items-center group">
+                    <div className="w-8 text-xs text-surface-400 text-right pr-2">Y3</div>
+                    <div className="h-6 bg-emerald-500/20 border border-emerald-500/50 rounded-r transition-all group-hover:bg-emerald-500/30" style={{ width: '80%' }}></div>
+                    <span className="ml-2 text-xs text-emerald-400 font-mono">+$414K</span>
+                  </div>
+                </div>
+              </div>
               
-              <div className="relative pt-6 pb-2">
-                {/* Y Axis line */}
-                <div className="absolute left-8 top-0 bottom-0 w-px bg-surface-700"></div>
-                {/* X Axis line (Zero line) */}
-                <div className="absolute left-8 right-0 bottom-16 h-px bg-surface-500 border-dashed border-b border-surface-500"></div>
-                
-                {/* Year 0 */}
-                <div className="relative h-12 mb-4 flex items-center group">
-                  <div className="w-8 text-xs text-surface-400 text-right pr-2">Y0</div>
-                  <div className="h-6 bg-red-500/20 border border-red-500/50 rounded-r transition-all group-hover:bg-red-500/30" style={{ width: '60%' }}></div>
-                  <span className="ml-2 text-xs text-red-400 font-mono">-$480K</span>
-                </div>
-                
-                {/* Year 1 */}
-                <div className="relative h-12 mb-4 flex items-center group">
-                  <div className="w-8 text-xs text-surface-400 text-right pr-2">Y1</div>
-                  <div className="h-6 bg-red-500/20 border border-red-500/50 rounded-r transition-all group-hover:bg-red-500/30" style={{ width: '40%' }}></div>
-                  <span className="ml-2 text-xs text-red-400 font-mono">-$213K</span>
-                </div>
-                
-                {/* Year 2 */}
-                <div className="relative h-12 mb-4 flex items-center group">
-                  <div className="w-8 text-xs text-surface-400 text-right pr-2">Y2</div>
-                  <div className="h-6 bg-emerald-500/20 border border-emerald-500/50 rounded-r transition-all group-hover:bg-emerald-500/30" style={{ width: '15%' }}></div>
-                  <span className="ml-2 text-xs text-emerald-400 font-mono">+$54K</span>
-                </div>
-                
-                {/* Year 3 */}
-                <div className="relative h-12 flex items-center group">
-                  <div className="w-8 text-xs text-surface-400 text-right pr-2">Y3</div>
-                  <div className="h-6 bg-emerald-500/20 border border-emerald-500/50 rounded-r transition-all group-hover:bg-emerald-500/30" style={{ width: '80%' }}></div>
-                  <span className="ml-2 text-xs text-emerald-400 font-mono">+$414K</span>
-                </div>
+              <div className="mt-8 p-4 bg-surface-900 border border-surface-800 rounded-lg">
+                <p className="text-sm text-surface-400">
+                  <strong className="text-surface-100">Conclusion:</strong> By treating EA as a product with explicit SLAs rather than a manual documentation exercise, the platform rapidly transitions from a cost center to a profit multiplier.
+                </p>
               </div>
             </motion.div>
           </div>
